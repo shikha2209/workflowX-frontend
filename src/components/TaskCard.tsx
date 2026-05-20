@@ -3,26 +3,43 @@ import {
   Typography,
   Chip,
   Box,
+  IconButton,
 } from "@mui/material";
+
+import DeleteIcon from "@mui/icons-material/Delete";
+
 
 interface TaskProps {
   title: string;
   description: string;
   status: string;
+  onDelete?: () => void;
 }
 
 export default function TaskCard({
   title,
   description,
   status,
+  onDelete,
 }: TaskProps) {
   return (
     <Card
       sx={{
         p: 3,
         borderRadius: 4,
+        position:"relative"
       }}
     >
+         <IconButton
+        sx={{
+          position:"absolute",
+          top:10,
+          right:10
+        }}
+        onClick={onDelete}
+      >
+        <DeleteIcon/>
+      </IconButton>
       <Typography
         variant="h6"
         sx={{
