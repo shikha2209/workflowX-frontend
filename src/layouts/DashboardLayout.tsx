@@ -15,6 +15,8 @@ export default function DashboardLayout({
     <Box
       sx={{
         display: "flex",
+        minHeight: "100vh",
+        bgcolor: "#f8fafc",
       }}
     >
       <Sidebar />
@@ -22,11 +24,13 @@ export default function DashboardLayout({
       <Box
         sx={{
           flex: 1,
+           width: "100%",
+          overflow: "auto",
         }}
       >
         <Navbar />
 
-        <Box sx={{ p: 4 }}>
+        <Box sx={{  width: "100%",p: 4 }}>
           {children}
         </Box>
       </Box>

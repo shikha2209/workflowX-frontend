@@ -51,7 +51,7 @@
 }
 
 #root {
-  width: 1126px;
+  width: 1280px;
   max-width: 100%;
   margin: 0 auto;
   text-align: center;
@@ -60,6 +60,8 @@
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  padding: 2rem;
+  text-align: center;
 }
 
 body {

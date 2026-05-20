@@ -19,11 +19,16 @@ export default function Sidebar() {
   return (
     <Box
       sx={{
-        width: 260,
-        height: "100vh",
+        width:{
+   xs:80,
+   md:260
+},
+       
         bgcolor: "#111827",
         color: "white",
         p: 3,
+        minHeight:"100vh",
+flexShrink:0
       }}
     >
       <Typography
