@@ -8,6 +8,7 @@ import {
 import Login from "../pages/auth/Login";
 import Signup from "../pages/auth/Signup";
 import Dashboard from "../pages/dashboard/Dashboard";
+import Tasks from "../pages/tasks/Tasks";
 
 export default function AppRoutes() {
   return (
@@ -32,6 +33,11 @@ export default function AppRoutes() {
         <Route
  path="/dashboard"
  element={<Dashboard/>}
+/>
+
+<Route
+  path="/tasks"
+  element={<Tasks/>}
 />
 
       </Routes>
