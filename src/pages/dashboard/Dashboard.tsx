@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import StatCard from "../../components/StatCard";
+import RecentActivity from "../../components/RecentActivity";
 
 export default function Dashboard() {
   const stats = [
@@ -38,8 +39,10 @@ export default function Dashboard() {
             title={item.title}
             value={item.value}
           />
+          
         ))}
       </Box>
+      <RecentActivity />
     </DashboardLayout>
   );
 }

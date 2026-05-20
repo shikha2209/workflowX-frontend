@@ -33,7 +33,7 @@ export default function Sidebar() {
           mb: 4,
         }}
       >
-        TaskFlow
+        WorkFlow
       </Typography>
 
       <List>
