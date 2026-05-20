@@ -7,6 +7,7 @@ import {
 
 import Login from "../pages/auth/Login";
 import Signup from "../pages/auth/Signup";
+import Dashboard from "../pages/dashboard/Dashboard";
 
 export default function AppRoutes() {
   return (
@@ -27,6 +28,11 @@ export default function AppRoutes() {
           path="/signup"
           element={<Signup />}
         />
+
+        <Route
+ path="/dashboard"
+ element={<Dashboard/>}
+/>
 
       </Routes>
     </BrowserRouter>
