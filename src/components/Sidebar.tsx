@@ -18,18 +18,25 @@ const menuItems = [
 export default function Sidebar() {
   return (
     <Box
-      sx={{
-        width:{
-   xs:80,
-   md:260
-},
-       
-        bgcolor: "#111827",
-        color: "white",
-        p: 3,
-        minHeight:"100vh",
-flexShrink:0
-      }}
+        sx={{
+    width: {
+      xs: 0,
+      md: 260,
+    },
+    minWidth: {
+      md: 260,
+    },
+    minHeight: "100vh",
+    flexShrink: 0,
+    bgcolor: "#111827",
+    color: "white",
+    p: 3,
+    overflow: "hidden",
+    display: {
+      xs: "none",
+      md: "block",
+    }
+  }}
     >
       <Typography
         variant="h5"

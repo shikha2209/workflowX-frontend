@@ -4,6 +4,8 @@ import {
   Box,
   Button,
   Typography,
+  TextField,
+  MenuItem,
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
@@ -21,7 +23,6 @@ interface Task {
 }
 
 export default function Tasks() {
-
   const [open, setOpen] =
     useState(false);
 
@@ -31,53 +32,54 @@ export default function Tasks() {
   const [selectedTask, setSelectedTask] =
     useState("");
 
+  const [search, setSearch] =
+    useState("");
+
+  const [filter, setFilter] =
+    useState("All");
+
   const [tasks, setTasks] =
     useState<Task[]>([
       {
         title: "Login UI",
         description:
           "Create authentication screens",
-        status: "Completed"
+        status: "Completed",
       },
 
       {
         title: "Dashboard",
         description:
           "Build dashboard layout",
-        status: "In Progress"
+        status: "In Progress",
       },
 
       {
         title: "Task Module",
         description:
           "Implement task features",
-        status: "Pending"
-      }
+        status: "Pending",
+      },
     ]);
 
   const addTask = (
     newTask: Task
   ) => {
-
     setTasks((prev) => [
       ...prev,
-      newTask
+      newTask,
     ]);
-
   };
 
   const openDeleteModal = (
     title: string
   ) => {
-
     setSelectedTask(title);
 
     setDeleteOpen(true);
-
   };
 
   const handleDelete = () => {
-
     setTasks(
       tasks.filter(
         (task) =>
@@ -87,26 +89,47 @@ export default function Tasks() {
     );
 
     setDeleteOpen(false);
-
   };
+
+  const filteredTasks =
+    tasks.filter((task) => {
+      const matchesSearch =
+        task.title
+          .toLowerCase()
+          .includes(
+            search.toLowerCase()
+          );
+
+      const matchesFilter =
+        filter === "All" ||
+        task.status === filter;
+
+      return (
+        matchesSearch &&
+        matchesFilter
+      );
+    });
 
   return (
     <DashboardLayout>
-
       <Box
         sx={{
           display: "flex",
+          flexDirection: {
+      xs: "column",
+      sm: "row",
+    },
           justifyContent:
             "space-between",
           alignItems: "center",
-          mb: 4
+          mb: 4,
+          gap: 2,
         }}
       >
-
         <Typography
           variant="h4"
           sx={{
-            fontWeight: 700
+            fontWeight: 700,
           }}
         >
           Tasks
@@ -118,49 +141,114 @@ export default function Tasks() {
           onClick={() =>
             setOpen(true)
           }
+          sx={{
+      width: {
+        xs: "100%",
+        sm: "auto",
+      }
+    }}
         >
           Create Task
         </Button>
-
       </Box>
+
+      {/* Search + Filter */}
+
+      <Box
+        sx={{
+          display: "flex",
+           flexDirection: {
+      xs: "column",
+      md: "row",
+    },
+          gap: 2,
+          mb: 4,
+        }}
+      >
+        <TextField
+          label="Search Tasks"
+          value={search}
+          onChange={(e) =>
+            setSearch(
+              e.target.value
+            )
+          }
+          fullWidth
+        />
+
+        <TextField
+          select
+          label="Filter"
+          value={filter}
+          onChange={(e) =>
+            setFilter(
+              e.target.value
+            )
+          }
+          sx={{
+            width:{ xs: "100%",
+        md: 200,
+      },
+          }}
+        >
+          <MenuItem value="All">
+            All
+          </MenuItem>
+
+          <MenuItem value="Pending">
+            Pending
+          </MenuItem>
+
+          <MenuItem value="In Progress">
+            In Progress
+          </MenuItem>
+
+          <MenuItem value="Completed">
+            Completed
+          </MenuItem>
+        </TextField>
+      </Box>
+
+      {/* Task Grid */}
 
       <Box
         sx={{
           display: "grid",
           gridTemplateColumns:
-            "repeat(auto-fit,minmax(280px,1fr))",
-          gap: 3
+           { xs: "1fr",
+      sm: "repeat(2,1fr)",
+      lg: "repeat(3,1fr)",},
+          gap: 3,
         }}
       >
-
-        {tasks.length > 0 ? (
-
-          tasks.map((task) => (
-
-            <TaskCard
-              key={task.title}
-              title={task.title}
-              description={
-                task.description
-              }
-              status={task.status}
-              onDelete={() =>
-                openDeleteModal(
+        {filteredTasks.length >
+        0 ? (
+          filteredTasks.map(
+            (task) => (
+              <TaskCard
+                key={task.title}
+                title={
                   task.title
-                )
-              }
-            />
-
-          ))
-
+                }
+                description={
+                  task.description
+                }
+                status={
+                  task.status
+                }
+                onDelete={() =>
+                  openDeleteModal(
+                    task.title
+                  )
+                }
+              />
+            )
+          )
         ) : (
-
           <Typography>
-            No tasks available
+            No tasks found
           </Typography>
-
         )}
-
       </Box>
 
       <CreateTaskModal
@@ -180,7 +268,6 @@ export default function Tasks() {
           handleDelete
         }
       />
-
     </DashboardLayout>
   );
 }

@@ -6,6 +6,7 @@ import {
   InputBase,
   Toolbar,
 } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 
 import {
   NotificationsOutlined,
@@ -29,6 +30,16 @@ export default function Navbar() {
           justifyContent: "space-between",
         }}
       >
+        <IconButton
+  sx={{
+    display: {
+      xs: "flex",
+      md: "none",
+    }
+  }}
+>
+  <MenuIcon />
+</IconButton>
         <Box
           sx={{
             display: "flex",
