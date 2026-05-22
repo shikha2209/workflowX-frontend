@@ -20,12 +20,14 @@ interface Props{
   open:boolean;
   handleClose:()=>void;
   task:Task | null;
+  handleEdit: () => void;
 }
 
 export default function TaskDetailsDrawer({
 open,
 handleClose,
-task
+task,
+handleEdit
 }:Props){
 
 if(!task) return null;
@@ -103,6 +105,21 @@ sx={{
 
 </Box>
 
+<Box
+sx={{
+display:"flex",
+gap:2,
+mt:4
+}}
+>
+
+<Button
+variant="outlined"
+fullWidth
+onClick={handleEdit}
+>
+Edit
+</Button>
 <Button
 fullWidth
 variant="contained"
@@ -111,7 +128,7 @@ onClick={handleClose}
 >
 Close
 </Button>
-
+</Box>
 </Box>
 
 </Drawer>
