@@ -21,13 +21,15 @@ interface Props{
   handleClose:()=>void;
   task:Task | null;
   handleEdit: () => void;
+  handleDelete: () => void;
 }
 
 export default function TaskDetailsDrawer({
 open,
 handleClose,
 task,
-handleEdit
+handleEdit,
+handleDelete
 }:Props){
 
 if(!task) return null;
@@ -106,20 +108,41 @@ sx={{
 </Box>
 
 <Box
-sx={{
-display:"flex",
-gap:2,
-mt:4
-}}
+  sx={{
+    display: "flex",
+    gap: 1.5,
+    mt: 4,
+    justifyContent: "center",
+    flexWrap: "wrap",
+  }}
 >
 
-<Button
-variant="outlined"
-fullWidth
-onClick={handleEdit}
->
-Edit
-</Button>
+  <Button
+    variant="outlined"
+    size="small"
+    onClick={handleEdit}
+    sx={{
+      borderRadius: "999px",
+      px: 3,
+      minWidth: "90px",
+    }}
+  >
+    Edit
+  </Button>
+
+  <Button
+    variant="outlined"
+    color="error"
+    size="small"
+    onClick={handleDelete}
+    sx={{
+      borderRadius: "999px",
+      px: 3,
+      minWidth: "90px",
+    }}
+  >
+    Delete
+  </Button>
 <Button
 fullWidth
 variant="contained"
