@@ -1,11 +1,21 @@
 import { useState, useEffect } from "react";
-import { Box, Typography, Chip, Avatar } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Chip,
+  Avatar,
+  Button,
+  Card,
+  CardContent,
+} from "@mui/material";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import type { DropResult } from "@hello-pangea/dnd";
 import TaskDetailsDrawer from "../../components/TaskDetailsDrawer";
 import EditTaskModal from "../../components/EditTaskModal";
-
+import CreateTaskModal from "../../components/CreateTaskModal";
+import DeleteConfirmModal from "../../components/DeleteConfirmModal";
+import ActivityPanel from "../../components/ActivityPanel";
 interface Task {
   id: string;
   title: string;
@@ -89,7 +99,17 @@ export default function Kanban() {
   const [editOpen, setEditOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [activities, setActivities] = useState([
+    {
+      id: "1",
+      message: "🟢 Project started",
+    },
+  ]);
+  const [search, setSearch] = useState("");
 
+  const [priorityFilter, setPriorityFilter] = useState("All");
   // ✅ Initialize from localStorage instead of hard-coded data
   const [columns, setColumns] = useState<Columns>(loadColumns);
 
@@ -129,7 +149,10 @@ export default function Kanban() {
     setColumns({
       ...columns,
       [source.droppableId]: { ...sourceColumn, tasks: sourceTasks },
-      [destination.droppableId]: { ...destinationColumn, tasks: destinationTasks },
+      [destination.droppableId]: {
+        ...destinationColumn,
+        tasks: destinationTasks,
+      },
     });
   };
 
@@ -150,20 +173,247 @@ export default function Kanban() {
         newColumns[columnId] = {
           ...newColumns[columnId],
           tasks: newColumns[columnId].tasks.map((task) =>
-            task.id === updatedTask.id ? updatedTask : task
+            task.id === updatedTask.id ? updatedTask : task,
           ),
         };
       });
       return newColumns;
     });
     setSelectedTask(updatedTask);
+    setActivities((prev) => [
+      {
+        id: Date.now().toString(),
+        message: `🔵 Updated ${updatedTask.title}`,
+      },
+      ...prev,
+    ]);
   };
+  const addTask = (newTask: Task) => {
+    setColumns((prev) => ({
+      ...prev,
 
+      todo: {
+        ...prev.todo,
+
+        tasks: [...prev.todo.tasks, newTask],
+      },
+    }));
+    setActivities((prev) => [
+      {
+        id: Date.now().toString(),
+        message: `🟢 Created ${newTask.title}`,
+      },
+      ...prev,
+    ]);
+
+    // reset filters after create
+    setSearch("");
+
+    setPriorityFilter("All");
+  };
+  const handleDeleteTask = () => {
+    if (!selectedTask) return;
+
+    setColumns((prev) => {
+      const updated = {
+        ...prev,
+      };
+
+      Object.keys(updated).forEach((columnId) => {
+        updated[columnId] = {
+          ...updated[columnId],
+
+          tasks: updated[columnId].tasks.filter(
+            (task) => task.id !== selectedTask.id,
+          ),
+        };
+      });
+
+      return updated;
+    });
+
+    setSelectedTask(null);
+
+    setDrawerOpen(false);
+
+    setActivities((prev) => [
+      {
+        id: Date.now().toString(),
+        message: `🔴 Deleted ${selectedTask?.title}`,
+      },
+      ...prev,
+    ]);
+  };
+  const totalTasks = Object.values(columns).reduce(
+    (acc, column) => acc + column.tasks.length,
+    0,
+  );
+
+  const todoCount = columns.todo.tasks.length;
+
+  const progressCount = columns.progress.tasks.length;
+
+  const completedCount = columns.completed.tasks.length;
+
+  const getDueStatus = (dueDate: string) => {
+    const today = new Date();
+
+    const taskDate = new Date(dueDate);
+
+    if (taskDate < today) {
+      return {
+        label: "Overdue",
+        color: "error",
+      };
+    }
+
+    if (taskDate.toDateString() === today.toDateString()) {
+      return {
+        label: "Due Today",
+        color: "warning",
+      };
+    }
+
+    return {
+      label: "Upcoming",
+      color: "success",
+    };
+  };
   return (
     <DashboardLayout>
-      <Typography variant="h4" sx={{ fontWeight: 700, mb: 4 }}>
-        Kanban Board
-      </Typography>
+      <Box
+        sx={{
+          mb: 4,
+        }}
+      >
+        <ActivityPanel activities={activities} />
+      </Box>
+      <Box
+        sx={{
+          display: "grid",
+
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "repeat(2,1fr)",
+            lg: "repeat(4,1fr)",
+          },
+
+          gap: 3,
+          mb: 4,
+        }}
+      >
+        <Card
+          sx={{
+            borderRadius: 4,
+          }}
+        >
+          <CardContent>
+            <Typography color="text.secondary">Total Tasks</Typography>
+
+            <Typography variant="h4" sx={{ fontWeight: 700 }}>
+              {totalTasks}
+            </Typography>
+          </CardContent>
+        </Card>
+
+        <Card
+          sx={{
+            borderRadius: 4,
+          }}
+        >
+          <CardContent>
+            <Typography color="text.secondary">Todo</Typography>
+
+            <Typography variant="h4" sx={{ fontWeight: 700 }}>
+              {todoCount}
+            </Typography>
+          </CardContent>
+        </Card>
+
+        <Card
+          sx={{
+            borderRadius: 4,
+          }}
+        >
+          <CardContent>
+            <Typography color="text.secondary">In Progress</Typography>
+
+            <Typography variant="h4" sx={{ fontWeight: 700 }}>
+              {progressCount}
+            </Typography>
+          </CardContent>
+        </Card>
+
+        <Card
+          sx={{
+            borderRadius: 4,
+          }}
+        >
+          <CardContent>
+            <Typography color="text.secondary">Completed</Typography>
+
+            <Typography variant="h4" sx={{ fontWeight: 700 }}>
+              {completedCount}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+
+          flexDirection: {
+            xs: "column",
+            sm: "row",
+          },
+
+          justifyContent: "space-between",
+
+          alignItems: {
+            xs: "stretch",
+            sm: "center",
+          },
+
+          gap: 2,
+          mb: 4,
+        }}
+      >
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 700,
+
+            fontSize: {
+              xs: "1.7rem",
+              sm: "2rem",
+            },
+
+            textAlign: {
+              xs: "center",
+              sm: "left",
+            },
+          }}
+        >
+          Kanban Board
+        </Typography>
+
+        <Button
+          variant="contained"
+          onClick={() => setOpen(true)}
+          sx={{
+            width: {
+              xs: "100%",
+              sm: "auto",
+            },
+
+            py: 1.2,
+
+            borderRadius: 3,
+          }}
+        >
+          Create Task
+        </Button>
+      </Box>
 
       <DragDropContext onDragEnd={onDragEnd}>
         <Box
@@ -207,64 +457,111 @@ export default function Kanban() {
                     <Chip label={column.tasks.length} size="small" />
                   </Box>
 
-                  {column.tasks.map((task, index) => (
-                    <Draggable key={task.id} draggableId={task.id} index={index}>
-                      {(provided) => (
-                        <Box
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          onClick={() => openTaskDrawer(task)}
-                          sx={{
-                            bgcolor: "white",
-                            p: 2,
-                            borderRadius: 3,
-                            mb: 2,
-                            border: "1px solid #e5e7eb",
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-                            cursor: "grab",
-                            transition: "0.3s",
-                            "&:hover": { transform: "translateY(-3px)" },
-                          }}
-                        >
-                          <Typography sx={{ fontWeight: 600 }}>
-                            {task.title}
-                          </Typography>
-                          <Typography
-                            sx={{ mt: 1, color: "text.secondary", fontSize: 14 }}
-                          >
-                            {task.description}
-                          </Typography>
+                  {column.tasks
+
+                    .filter((task) => {
+                      const searchMatch = task.title
+                        .toLowerCase()
+                        .includes(search.toLowerCase());
+
+                      const priorityMatch =
+                        priorityFilter === "All"
+                          ? true
+                          : task.priority === priorityFilter;
+
+                      return searchMatch && priorityMatch;
+                    })
+                    .map((task, index) => (
+                      <Draggable
+                        key={task.id}
+                        draggableId={task.id}
+                        index={index}
+                      >
+                        {(provided) => (
                           <Box
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            onClick={() => openTaskDrawer(task)}
                             sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                              mt: 2,
+                              bgcolor: "white",
+                              p: 2,
+                              borderRadius: 3,
+                              mb: 2,
+                              border: "1px solid #e5e7eb",
+                              boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                              cursor: "grab",
+                              transition: "0.3s",
+                              "&:hover": { transform: "translateY(-3px)" },
                             }}
                           >
-                            <Chip
-                              label={task.priority}
-                              size="small"
-                              color={
-                                task.priority === "High"
-                                  ? "error"
-                                  : task.priority === "Medium"
-                                  ? "warning"
-                                  : "success"
-                              }
-                            />
-                            <Typography sx={{ fontSize: 12 }}>
-                              📅 {task.dueDate}
+                            <Typography sx={{ fontWeight: 600 }}>
+                              {task.title}
                             </Typography>
-                            <Avatar sx={{ width: 30, height: 30 }}>
-                              {task.assignee[0]}
-                            </Avatar>
+                            <Typography
+                              sx={{
+                                mt: 1,
+                                color: "text.secondary",
+                                fontSize: 14,
+                              }}
+                            >
+                              {task.description}
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                mt: 2,
+                              }}
+                            >
+                              <Chip
+                                label={task.priority}
+                                size="small"
+                                color={
+                                  task.priority === "High"
+                                    ? "error"
+                                    : task.priority === "Medium"
+                                      ? "warning"
+                                      : "success"
+                                }
+                              />
+                              <Avatar sx={{ width: 30, height: 30 }}>
+                                {task.assignee[0]}
+                              </Avatar>
+                            </Box>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                mt: 1.5,
+                              }}
+                            >
+                              <Typography sx={{ fontSize: 12 }}>
+                                📅 {task.dueDate}
+                              </Typography>
+                              <Typography
+                                sx={{
+                                  fontSize: 12,
+                                  fontWeight: 600,
+
+                                  color:
+                                    getDueStatus(task.dueDate).color === "error"
+                                      ? "#d32f2f"
+                                      : getDueStatus(task.dueDate).color ===
+                                          "warning"
+                                        ? "#ed6c02"
+                                        : "#2e7d32",
+                                }}
+                              >
+                                {getDueStatus(task.dueDate).label}
+                              </Typography>
+                            </Box>
                           </Box>
-                        </Box>
-                      )}
-                    </Draggable>
-                  ))}
+                        )}
+                      </Draggable>
+                    ))}
 
                   {provided.placeholder}
                 </Box>
@@ -279,6 +576,7 @@ export default function Kanban() {
         handleClose={() => setDrawerOpen(false)}
         task={selectedTask}
         handleEdit={handleEdit}
+        handleDelete={() => setDeleteOpen(true)}
       />
 
       <EditTaskModal
@@ -287,7 +585,17 @@ export default function Kanban() {
         task={selectedTask}
         handleSave={handleSaveTask}
       />
+      <CreateTaskModal
+        open={open}
+        handleClose={() => setOpen(false)}
+        addTask={addTask}
+      />
+
+      <DeleteConfirmModal
+        open={deleteOpen}
+        handleClose={() => setDeleteOpen(false)}
+        handleDelete={handleDeleteTask}
+      />
     </DashboardLayout>
   );
-
 }
