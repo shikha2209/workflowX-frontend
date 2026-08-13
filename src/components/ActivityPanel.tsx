@@ -6,8 +6,11 @@ import {
 } from "@mui/material";
 
 interface Activity {
-  id:string;
-  message:string;
+  _id: string;
+  user?: string;
+  action?: string;
+  taskTitle?: string;
+  message: string;
 }
 
 interface Props{
@@ -55,7 +58,7 @@ activities.map(
 (activity)=>(
 
 <Box
-key={activity.id}
+key={activity._id || activity.message}
 sx={{
 p:1.5,
 borderRadius:2,
@@ -65,7 +68,8 @@ bgcolor:"#f8fafc"
 
 <Typography
 sx={{
-  fontSize: 14
+  fontSize: 14,
+  color:"black",
 }}
 >
 {activity.message}

@@ -5,17 +5,51 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
+import { useNavigate }
+from "react-router-dom";
+import { useAuth }
+from "../context/useAuth";
 
-const menuItems = [
-  "Dashboard",
-  "Projects",
-  "Tasks",
-  "Team",
-  "Notifications",
-  "Settings",
-];
+
 
 export default function Sidebar() {
+  const navigate =
+useNavigate();
+const {
+    role
+  } =
+  useAuth();
+
+  const menuItems = [
+
+    {
+      label: "Dashboard",
+
+      path:
+      role?.toLowerCase() === "admin"
+      ? "/dashboard/admin"
+      : "/dashboard/user",
+    },
+
+    {
+      label: "Kanban",
+      path: "/kanban",
+    },
+
+    ...(role?.toLowerCase() === "admin"
+
+      ? [
+
+          {
+            label: "Users",
+            path: "/users",
+          },
+
+        ]
+
+      : []),
+
+  ];
   return (
     <Box
         sx={{
@@ -50,16 +84,23 @@ export default function Sidebar() {
 
       <List>
         {menuItems.map((item) => (
-          <ListItemButton
-            key={item}
-            sx={{
-              borderRadius: 2,
-              mb: 1,
-            }}
-          >
-            <ListItemText primary={item} />
-          </ListItemButton>
-        ))}
+
+  <ListItemButton
+    key={item.label}
+    onClick={() =>
+      navigate(item.path)
+    }
+    sx={{
+      borderRadius: 2,
+      mb: 1,
+    }}
+  >
+    <ListItemText
+      primary={item.label}
+    />
+  </ListItemButton>
+
+))}
       </List>
     </Box>
   );
