@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Box,
@@ -9,18 +9,13 @@ import {
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
-
+import type { Task } from "../../types/task";
 import DashboardLayout from "../../layouts/DashboardLayout";
-
+import { getTasks } from "../../services/taskApi";
 import TaskCard from "../../components/TaskCard";
 import CreateTaskModal from "../../components/CreateTaskModal";
 import DeleteTaskModal from "../../components/DeleteTaskModal";
 
-interface Task {
-  title: string;
-  description: string;
-  status: string;
-}
 
 export default function Tasks() {
   const [open, setOpen] =
@@ -39,28 +34,7 @@ export default function Tasks() {
     useState("All");
 
   const [tasks, setTasks] =
-    useState<Task[]>([
-      {
-        title: "Login UI",
-        description:
-          "Create authentication screens",
-        status: "Completed",
-      },
-
-      {
-        title: "Dashboard",
-        description:
-          "Build dashboard layout",
-        status: "In Progress",
-      },
-
-      {
-        title: "Task Module",
-        description:
-          "Implement task features",
-        status: "Pending",
-      },
-    ]);
+    useState<Task[]>([]);
 
   const addTask = (
     newTask: Task
@@ -80,6 +54,7 @@ export default function Tasks() {
   };
 
   const handleDelete = () => {
+    
     setTasks(
       tasks.filter(
         (task) =>
@@ -109,6 +84,23 @@ export default function Tasks() {
         matchesFilter
       );
     });
+
+    useEffect(()=> 
+      { 
+        const fetchTasks = 
+        async()=>{ 
+          try
+          { 
+            const response =
+             await getTasks(); 
+             setTasks( response.data ); 
+            } 
+            catch(error){ 
+              console.log(error); 
+            } 
+          }; 
+          fetchTasks(); 
+        },[]);
 
   return (
     <DashboardLayout>

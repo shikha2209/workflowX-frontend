@@ -15,10 +15,17 @@
     "@hello-pangea/dnd": "^18.0.1",
     "@mui/icons-material": "^9.0.1",
     "@mui/material": "^9.0.1",
+    "@mui/x-date-pickers": "^9.3.0",
+    "axios": "^1.16.1",
+    "date-fns": "^4.4.0",
+    "dayjs": "^1.11.21",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-hook-form": "^7.76.0",
-    "react-router-dom": "^7.15.1"
+    "react-phone-input-2": "^2.15.1",
+    "react-router-dom": "^7.15.1",
+    "react-toastify": "^11.1.0",
+    "recharts": "^3.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

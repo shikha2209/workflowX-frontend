@@ -43,7 +43,7 @@ export default function AuthLayout({
             variant="h3"
             sx={{ fontWeight: 700 }}
           >
-            TaskFlow
+            WorkFlow
           </Typography>
 
           <Typography sx={{ mt: 3 }}>
